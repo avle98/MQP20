@@ -1,0 +1,9 @@
+http://www.uniprot.org/uniprot/P60709
+http://www.uniprot.org/uniprot/P08670
+http://www.uniprot.org/uniprot/P68871
+http://www.uniprot.org/uniprot/P60174
+http://www.uniprot.org/uniprot/P69905
+http://www.uniprot.org/uniprot/P23527
+http://www.uniprot.org/uniprot/P07339
+http://www.uniprot.org/uniprot/P62937
+
