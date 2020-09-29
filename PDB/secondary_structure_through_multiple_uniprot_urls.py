@@ -1,82 +1,123 @@
+####
+# Le Gall Lab at Ragon Institute of MIT, Harvard, and MGH
+# Ann Le
+# July 2017
+# Last Updated: July 18, 2018
+# Protocol Name: Analyzing Secondary Structure Through Multiple UniProt URLs
+# This code takes in a text file of Uniprot URLS and prints all the secondary structure information along with the
+# corresponding peptide strings for each secondary structure.
+####
+
 from bs4 import BeautifulSoup
 import urllib2
-# from tqdm import tqdm
-# import time
 
-import re
-import csv
+def find_ss_uniprot(url_text_file):
 
-# from datetime import datetime
+    # open text file of all urls for uniprot
+    quote_page = open(url_text_file)
 
+    # print column titles
+    print 'Accession_Number_Secondary_Structure_Availability ' + \
+          'SEQ ' + 'H_START ' + 'H_END ' 'H_LEN ' + 'S_START ' + 'S_END ' +'S_LEN ' + 'T_START ' + 'T_END ' + 'T_LEN ' + \
+            ' ' + ' HELICES ' 'H_PEP ' + 'STRANDS ' + 'S_PEP ' + 'TURNS ' + 'T_PEP '
 
-####open text file of all urls for uniprot
-# change 'urls' to the name of your created file of all UniProt URLs
-quote_page = open('/Users/Ann Le/Documents/R_at_Ragon/urls.txt')
+    # a for loop to find information from all uniprot urls
+    for pg in quote_page:
+        print  # have a break between each protein
+        page = urllib2.urlopen(pg).read() # query website and return the html to the variable 'site'
+        soup = BeautifulSoup(page, 'html.parser') # parse html using beautiful soup and store in variable 'soup'
 
-####print column titles
-print 'Accession_Number_Secondary_Structure_Availability ' + \
-      'HELIX ' + 'HSEQ ' + 'STRAND' + 'TURN'
+        # scrape out the peptide accession number
+        span_id = soup.findAll('span', {'id': 'entrySequence'})
 
-####for loop to put all information into dictionary
-for pg in quote_page:
-    print  # have a break between each protein
-    ####query website and return the html to the  variable 'site'
-    page = urllib2.urlopen(pg).read()
-    ####parse html using beautiful soup and store in variable 'soup'
-    soup = BeautifulSoup(page, 'html.parser')
-
-    ####get the peptide information
-    span_id = soup.findAll('span', {'id': 'entrySequence'})
-    ####get the secondary structure
-    second_structure = soup.find('div', {'id': 'secondarystructure'})
-    if second_structure:  # when you find secondarystrucutre
-        for accessions in span_id:
-            print 'Available:' + accessions.getText()[4:10]  # print message
-    else:  # if you can't find secondarystructure
-        for accessions in span_id:
-            print 'Not_available:' + accessions.getText()[4:10]  # print message
-
-    ####print secondary structure information in 6 separate columns
-
-    list1 = []
-    list2 = []
-    list3 = []
-    list4 = []
-
-    for helix in soup.findAll('rect', attrs={'class': 'HELIX'}):
-        helices = helix['title']
-        list1.append(helices[6:])  # add helices info into list1
-
-    for strand in soup.findAll('rect', attrs={'class': 'STRAND'}):
-        beta_sheets = strand['title']
-        list3.append(beta_sheets[7:])  # add betasheet/strand info into list2
-
-    for turn in soup.findAll('rect', attrs={'class': 'TURN'}):
-        turns = turn['title']
-        list4.append(turns[5:])  # add turns info into list3
-
-    for a, b, c, d in map(None, list1, list2, list3, list4):
-        for accessions in span_id:
-            print accessions.getText()[4:10]
-            print ' ', a, b, c, d
-
-#    for i in tqdm(range(100)):
-#        time.sleep(0.01)
+        # scrape out whether a secondary structure is detected
+        second_structure = soup.find('div', {'id': 'secondarystructure'})
+        if second_structure: # when you find secondary structure
+            for accessions in span_id: # for accession number
+                print 'Available:' + accessions.getText()[4:10]  # print message and get peptide accession number
+        else:  # if you can't find secondary structure
+            for accessions in span_id: # for accession number
+                print 'Not_available:' + accessions.getText()[4:10]  # print message and get peptide accession number
 
 
-#######CODE IDEAS TO BE IMPROVED IF PRINTED DIRECTLY ONTO EXCEL WITHOUT TERMINAL USE
-####save data in tuple
-##    data.append((span_id, id_name, helices, beta_sheets, turns))
+        # create empty lists for uniprot information to be stored in all of them
+        listsequences = []
+        hs = []
+        he = []
+        hlen = []
+        ss = []
+        se = []
+        slen= []
+        ts = []
+        te = []
+        tlen = []
+        listhelices = []
+        liststrands = []
+        listturns = []
 
 
-####open a csv file to write information into
-##with open('results.csv', 'w') as csvfile:
-##    writer = csv.writer(csvfile, delimiter=',')
-##    #write colum heads as first line
-##    writer.writerow(['Run Date', 'Accession Protein', 'Protein Name', 'Alpha Helices', 'Beta Sheets'])
-##
-##    #print out the data into columns
-##    for span_id, id_name, helices, beta_sheets in data:
-##        writer.writerow([datetime.now(), span_id[4:10], id_name[1:id_name.find('-')], helices, beta_sheets]
+        # find sequence information
+        for sequence in soup.findAll('span', attrs={'id': 'entrySequence'}):
+            listseq = sequence.getText().splitlines(True)
+            seq2 = listseq[1:]
+            seq3 = ''.join(seq2)
+            listsequences.append(seq3) # add the peptide sequence into the 'listsequences'
 
-print "Successful!"  # will print at the bottom if everything is printed out
+        # find helices information
+        for helix in soup.findAll('rect', attrs={'class': 'HELIX'}):
+            hel = helix['title']
+            helices = hel[6:]
+            hellista = helices.split('-')[0]
+            hellistb = helices.split('-')[1]
+
+            hs.append(hellista)  # add helices start info into 'hs'
+            he.append(hellistb)  # add helices end info into 'he'
+            hlen.append((int(hellistb))-(int(hellista))+1) # add helices length info into 'hlen'
+            listhelices.append(helices) # add the helices range info into 'listhelices'
+
+        # find strands/beta-sheets information
+        for strand in soup.findAll('rect', attrs={'class': 'STRAND'}):
+            beta = strand['title']
+            beta_sheets = beta[7:]
+            betalista = beta_sheets.split('-')[0]
+            betalistb = beta_sheets.split('-')[1]
+            
+            ss.append(betalista)  # add betasheet/strand start info into ss
+            se.append(betalistb)  # add betasheet/strand end info into se
+            slen.append((int(betalistb))-(int(betalista))+1) # add betasheet/strand length info into 'slen'
+            liststrands.append(beta_sheets) # add the helices range info into 'liststrands'
+
+        # find turns information
+        for turn in soup.findAll('rect', attrs={'class': 'TURN'}):
+            turns = turn['title']
+            turnss = turns[5:]
+            turnslista = turnss.split('-')[0]
+            turnslistb = turnss.split('-')[1]
+
+            ts.append(turnslista)  # add turns start info into ts
+            te.append(turnslistb)  # add turns end info into te
+            tlen.append((int(turnslistb))-(int(turnslista))+1) # add turns length info into 'tlen'
+            listturns.append(turnss) # add the turns range info into 'listturns'
+
+
+
+
+        empty = ''  # an empty string to use for spacing later
+
+        # print uniprot information
+        for a,b,c,d,e,f,g,h,i,j,k,l in map(None, hs, he, hlen, ss, se, slen, ts, te, tlen, listhelices, liststrands, listturns):
+            for accessions in span_id:
+                print accessions.getText()[4:10],listsequences,a,b,c,d,e,f,g,h,i,empty,empty,j,empty,k,empty,l
+
+
+
+    print "\nSuccessful!"  # will print at the bottom if everything is printed out
+
+
+
+
+# if terminal calls this script then the following will run
+if __name__ == '__main__':
+    # change 'url_text_file' to the designated path to the name of your created file of all UniProt URLs
+    find_ss_uniprot('/Users/legalllab/Documents/PDB/Example Files/Env.txt')
+
