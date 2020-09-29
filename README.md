@@ -13,21 +13,15 @@ Today, an estimated 38,000 new HIV infections still occur in the United States (
 Within the MQP20, there are example .txt files that are used within Python code distributed amongst the various folders. <br/>
 There are also files for the MQP paper and PowerPoint presentation.
 
-#### BLAST
-Basic Local Alignment Search Tool was used for peptide data.
+#### BLAST: Basic Local Alignment Search Tool was used for peptide data.
 
-#### Misc Code
-Code created for various specific tasks within the lab. 
+#### Misc Code: Code created for various specific tasks within the lab. 
 
-#### MySQL Databases
-Code and protocols for database design for wet lab data.
+#### MySQL Databases: Code and protocols for database design for wet lab data.
 
-#### Other Protocols
-Protocols for code stored in various other folders. 
+#### Other Protocols: Protocols for code stored in various other folders. 
 
-#### Presentations
-Group meeting presentations.
+#### Presentations: Group meeting presentations.
 
-#### Pymol
-Molecular visualization system for proteins.
+#### Pymol: Molecular visualization system for proteins.
 
